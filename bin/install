@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+source "$(dirname $0)/../lib/utils.sh"
+
+function install_guile {
+    local install_type=$1
+    local version=$2
+    local install_path=$3
+    local tmp_download_dir="$4"
+
+    if [ "$install_type" != "version" ]; then
+        echo "Cannot install specific ref from source, sorry."
+        echo "For a list of available versions, see \`asdf list-all guile\`"
+        exit 1
+    fi
+
+    local archive_path=$(local_archive_path $version $tmp_download_dir)
+    download_file "$(source_url $version)" "$archive_path"
+
+    local signature_path=$(local_signature_path $version $tmp_download_dir)
+    download_file "$(signature_url $version)" "$signature_path"
+
+    verify_download "$version" "$signature_path" "$archive_path" "$tmp_download_dir"
+
+    (
+        if ! type "xz" &> /dev/null; then
+            echo "ERROR: xz not found"
+            exit 1
+        fi
+
+        tar -xzf $archive_path -C $tmp_download_dir
+        cd "$tmp_download_dir/$(source_name $version)"
+        ./configure --prefix="$install_path"
+        make
+        make install
+    )
+
+    echo "Installation complete."
+}
+
+function local_archive_path() {
+    local version=$1
+    local tmp_download_dir=$2
+
+    echo "$tmp_download_dir/$(source_archive_name $version)"
+}
+
+function local_signature_path() {
+    local version=$1
+    local tmp_download_dir=$2
+
+    echo "$tmp_download_dir/$(signature_name $version)"
+}
+
+function download_file() {
+    local download_url=$1
+    local download_path=$2
+
+    echo "Downloading $download_url"
+    curl -#Lo $download_path -C - $download_url
+}
+
+function source_url {
+    local version=$1
+
+    echo "$(base_url)/$(source_archive_name $version)"
+}
+
+function signature_url {
+    local version=$1
+
+    echo "$(base_url)/$(signature_name $version)"
+}
+
+function source_archive_name {
+    local version=$1
+
+    echo "$(source_name $version).tar.xz"
+}
+
+function base_url {
+    echo "https://ftp.gnu.org/gnu/guile"
+}
+
+function signature_name {
+    local version=$1
+
+    echo "$(source_archive_name $version).sig"
+}
+
+function source_name {
+    local version=$1
+
+    echo "guile-${version}"
+}
+
+function verify_download() {
+    local version=$1
+    local signature_path=$2
+    local file_path=$3
+    local tmp_download_dir=$4
+    local archive_name=$(source_archive_name $version)
+
+    echo "Verifying $archive_name"
+    gpg --no-default-keyring --keyring "$tmp_download_dir/keys.gpg" --keyserver keys.gnupg.net --verify "$signature_path" "$file_path"
+
+    if [ $? -ne 0 ]; then
+       echo "The archive $archive_name failed GPG verification. Exitng... "
+       exit 1
+    fi
+}
+
+tmp_download_dir="$(mktemp -d -t 'asdf_guile_XXXXXX')"
+trap 'rm -rf "${tmp_download_dir}"' EXIT
+
+install_guile "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH" "$tmp_download_dir"
+asdf reshim "$(plugin_name)" "$ASDF_INSTALL_VERSION"

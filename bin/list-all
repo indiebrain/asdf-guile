@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+echo "$(curl -s https://ftp.gnu.org/gnu/guile/ | sed -n 's/.*href="guile-\([^"]*\).tar.xz.*/\1/p' | uniq | awk '{print}' ORS=' ')"
