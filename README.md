@@ -10,8 +10,6 @@ GNU Guile plugin for [asdf](https://github.com/asdf-vm/asdf) version manager
 asdf plugin-add guile https://github.com/indiebrain/asdf-guile.git
 ```
 
-### Troubleshooting
+## Use
 
-#### macOS Homebrew users
-
-Homebrew installs libraries - like `readline` and `libffi` - into a non-standard prefix to avoid collisions with the OS provided ones. In order to make the Homebrew managed libraries available to the compilation process consider adding the` LDFLAGS`, `CPPFLAGS`, and `PKG_CONFIG_PATH` values listed in their `brew info` output to your bash environment. See the [.travis.yml](.travis.yml)'s `before_script` section for examples.
+Check [asdf readme](https://github.com/asdf-vm/asdf/blob/master/README.md) for instructions on how to install & manage versions of Guile.
