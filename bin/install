@@ -63,8 +63,10 @@ function source_archive_name {
     echo "$(source_name $version).tar.xz"
 }
 
-function base_url {
-    echo "https://ftp.gnu.org/gnu/guile"
+function signature_name {
+    local version=$1
+
+    echo "$(source_archive_name $version).sig"
 }
 
 function source_name {
