@@ -17,10 +17,13 @@ addons:
     packages:
       - build-essential
       - curl
+      - libtool
+      - libffi-dev
       - libgc-dev
       - libgc1c2
       - libunistring-dev
       - libunistring0
+      - libgmp-dev
       - xz-utils
     update: true
   homebrew:
