@@ -1,8 +1,42 @@
 language: c
-script: asdf plugin test guile $TRAVIS_BUILD_DIR 'node --version'
+script: asdf plugin test guile . --asdf-plugin-gitref $TRAVIS_BRANCH 'guile --version'
+
 before_script:
   - git clone https://github.com/asdf-vm/asdf.git asdf
   - . asdf/asdf.sh
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export LDFLAGS="$LDFLAGS -L/usr/local/opt/libffi/lib"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export LDFLAGS="$LDFLAGS -L/usr/local/opt/readline/lib"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export CPPFLAGS="$CPPFLAGS -I/usr/local/opt/readline/include"; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/readline/lib/pkgconfig"; fi
 os:
   - linux
   - osx
+addons:
+  apt:
+    packages:
+      - build-essential
+      - curl
+      - libtool
+      - libffi-dev
+      - libgc-dev
+      - libgc1c2
+      - libunistring-dev
+      - libunistring0
+      - libgmp-dev
+      - xz-utils
+    update: true
+  homebrew:
+    packages:
+      - autoconf
+      - automake
+      - gettext
+      - gnu-sed
+      - bdw-gc
+      - gmp
+      - libffi
+      - libtool
+      - libunistring
+      - pkg-config
+      - readline
+    update: true
