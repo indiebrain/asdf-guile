@@ -17,23 +17,27 @@ addons:
     packages:
       - build-essential
       - curl
-      - libtool
+      - dirmngr
+      - gnupg2
       - libffi-dev
       - libgc-dev
       - libgc1c2
+      - libgmp-dev
+      - libtool
       - libunistring-dev
       - libunistring0
-      - libgmp-dev
       - xz-utils
     update: true
   homebrew:
+    casks:
+      - gpg-suite
     packages:
       - autoconf
       - automake
-      - gettext
-      - gnu-sed
       - bdw-gc
+      - gettext
       - gmp
+      - gnu-sed
       - libffi
       - libtool
       - libunistring
