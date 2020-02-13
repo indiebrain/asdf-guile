@@ -19,6 +19,11 @@ function install_guile {
     local archive_path=$(local_archive_path $version $tmp_download_dir)
     download_file "$(source_url $version)" "$archive_path"
 
+    local signature_path=$(local_signature_path $version $tmp_download_dir)
+    download_file "$(signature_url $version)" "$signature_path"
+
+    verify_download "$version" "$signature_path" "$archive_path" "$tmp_download_dir"
+
     (
         if ! type "xz" &> /dev/null; then
             echo "ERROR: xz not found"
@@ -63,6 +68,19 @@ function source_archive_name {
     echo "$(source_name $version).tar.xz"
 }
 
+function local_signature_path() {
+    local version=$1
+    local tmp_download_dir=$2
+
+    echo "$tmp_download_dir/$(signature_name $version)"
+}
+
+function signature_url {
+    local version=$1
+
+    echo "$(base_url)/$(signature_name $version)"
+}
+
 function signature_name {
     local version=$1
 
@@ -75,8 +93,32 @@ function source_name {
     echo "guile-${version}"
 }
 
+function verify_download() {
+    local version=$1
+    local signature_path=$2
+    local file_path=$3
+    local tmp_download_dir=$4
+    local archive_name=$(source_archive_name $version)
+
+    echo "Verifying $archive_name"
+    if type "gpg" &> /dev/null; then
+        gpg_cmd=gpg
+    else
+        gpg_cmd=gpg2
+    fi
+
+    $gpg_cmd --keyserver hkp://keys.gnupg.net \
+             --keyserver-options auto-key-retrieve \
+             --verify "$signature_path"
+
+    if [ $? -ne 0 ]; then
+       echo "The archive $archive_name failed GPG verification. Exitng... "
+       exit 1
+    fi
+}
+
 tmp_download_dir="$(mktemp -d -t 'asdf_guile_XXXXXX')"
-trap 'rm -rf "${tmp_download_dir}"' EXIT
+# trap 'rm -rf "${tmp_download_dir}"' EXIT
 
 install_guile "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH" "$tmp_download_dir"
 asdf reshim "$(plugin_name)" "$ASDF_INSTALL_VERSION"
