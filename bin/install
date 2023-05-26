@@ -107,7 +107,7 @@ function verify_download() {
         gpg_cmd=gpg2
     fi
 
-    $gpg_cmd --keyserver hkp://keys.gnupg.net \
+    $gpg_cmd --keyserver hkp://keys.openpgp.org \
              --keyserver-options auto-key-retrieve \
              --verify "$signature_path"
 
