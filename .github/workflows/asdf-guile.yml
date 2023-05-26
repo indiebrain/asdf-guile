@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgc-dev \
+            libunistring-dev
+      - name: Install dependencies
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install bdw-gc
+      - name: Test plugin
+        uses: asdf-vm/actions/plugin-test@v2
+        with:
+          command: guile -v
