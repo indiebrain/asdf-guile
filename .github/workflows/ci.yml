@@ -38,7 +38,7 @@ jobs:
         run: |
           brew update
           brew install bdw-gc gnu-sed
-          echo PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
+          export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
       - name: Test plugin
         uses: asdf-vm/actions/plugin-test@v2
         with:
