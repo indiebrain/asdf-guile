@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  # Manual, through the Github Actions UI
+  workflow_dispatch:
+  # Weekly, on Monday, at 04:11
+  schedule:
+    - cron: '11 4 * * 1'
+  push:
+    branches:
+      - "master"
+  pull_request:
+    branches:
+      - "master"
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        guile-versions:
+          - latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgc-dev \
+            libunistring-dev
+      - name: Install dependencies
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install bdw-gc
+      - name: Test plugin
+        uses: asdf-vm/actions/plugin-test@v2
+        with:
+          version: ${{ matrix.guile-versions }}
+          command: guile -v

@@ -1,6 +1,6 @@
 # asdf-guile
 
-[![Build Status](https://travis-ci.org/indiebrain/asdf-guile.svg?branch=master)](https://travis-ci.org/indiebrain/asdf-guile)
+[![CI](https://github.com/indiebrain/asdf-guile/actions/workflows/asdf-guile.yml/badge.svg?branch=master)](https://github.com/indiebrain/asdf-guile/actions/workflows/asdf-guile.yml)
 
 GNU Guile plugin for [asdf](https://github.com/asdf-vm/asdf) version manager
 
