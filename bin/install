@@ -33,7 +33,7 @@ function install_guile {
         tar xf $archive_path -C $tmp_download_dir
         cd "$tmp_download_dir/$(source_name $version)"
 
-        ./configure --prefix="$install_path"
+        ./configure --prefix="$install_path" ${GUILE_CONFIG_OPTIONS:-""}
         make
         make install
     )
