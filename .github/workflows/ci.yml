@@ -29,14 +29,12 @@ jobs:
       - name: Install dependencies
         if: matrix.os == 'ubuntu-latest'
         run: |
-          sudo apt-get update
           sudo apt-get install -y \
             libgc-dev \
             libunistring-dev
       - name: Install dependencies
         if: matrix.os == 'macos-latest'
         run: |
-          brew update
           brew install bdw-gc gnu-sed
           export PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
       - name: Test plugin
